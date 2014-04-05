@@ -27,6 +27,8 @@ public class JettyRun extends BaseRunner {
    */
   public JettyRun() {
     this.resourceBase = System.getProperty(WEBAPP_RESOURCE_BASE,"src/main/webapp");
+    // In IDE can use this to shutdown in a console window
+    this.useStdInShutdown = true;
   }
   
   /**

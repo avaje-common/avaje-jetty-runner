@@ -1,6 +1,5 @@
 package org.avaje.jettyrunner;
 
-import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.SessionManager;
@@ -27,8 +26,10 @@ public abstract class BaseRunner {
   protected static final int DEFAULT_SHUTDOWN_TIMEOUT_ = 12000;
   protected static final String DEFAULT_CONTEXT_PATH = "/";
 
-  protected static final Logger log = Log.getLog();
+  protected static final Logger log = Log.getLogger("org.avaje.jettyrunner");
 
+  protected boolean useStdInShutdown;
+  
   protected int httpPort;
 
   protected String contextPath;
@@ -85,6 +86,12 @@ public abstract class BaseRunner {
       log.info("server started");
 
       Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownRunnable()));
+      
+      if (useStdInShutdown) {
+        // generally for use in IDE via JettyRun
+        System.in.read();
+        shutdownNicely(false);
+      }
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -92,11 +99,14 @@ public abstract class BaseRunner {
     }
   }
 
-  protected void shutdownNicely() {
+  protected void shutdownNicely(boolean normalShutdown) {
     try {
-      attemptCleanClose();
       server.stop();
       server.join();
+      if (normalShutdown) {
+        // only want to log this once
+        log.info("server stopped");
+      }
     } catch (Exception e) {
       e.printStackTrace();
       System.exit(100);
@@ -107,61 +117,11 @@ public abstract class BaseRunner {
 
     @Override
     public void run() {
-      shutdownNicely();
-    }
-
-  }
-
-  /*
-   * Attempts a clean close of the connectors and will wait for remaining
-   * connections if they are still open.
-   */
-  protected void attemptCleanClose() {
-
-    if (shutdownTimeout > 0) {
-      log.info("jetty shutdown: performing clean shutdown");
-      try {
-        Connector[] connectors = server.getConnectors();
-        if (connectors != null) {
-          for (Connector connector : connectors) {
-            connector.shutdown();
-          }
-        }
-
-        int open = statistics.getRequestsActive();
-        if (open > 0) {
-          waitForConnections(shutdownTimeout, open);
-        }
-      } catch (Exception e) {
-        log.warn("jetty shutdown: formal shutdown failed", e);
-      }
+      log.info("server shutting down");
+      shutdownNicely(true);
     }
   }
 
-  protected void waitForConnections(long timeout, int open) {
-
-    log.info("jetty shutdown: {} requests are active, delaying for {} ms", open, timeout);
-
-    timeout += System.currentTimeMillis();
-
-    while (true) {
-      try {
-        Thread.sleep(100);
-      } catch (InterruptedException e) {
-        log.warn("jetty shutdown: clean shutdown failed sleep interval");
-      }
-
-      open = statistics.getRequestsActive();
-
-      if (open <= 0)
-        break;
-
-      if (System.currentTimeMillis() >= timeout) {
-        log.warn("jetty shutdown: {} requests not finished, kicking them out", open);
-        break;
-      }
-    }
-  }
 
   /**
    * Set the secure cookies setting on the jetty session manager.
