@@ -3,7 +3,6 @@ package org.avaje.jettyrunner;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.SessionManager;
-import org.eclipse.jetty.server.handler.StatisticsHandler;
 import org.eclipse.jetty.server.session.AbstractSessionManager;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
@@ -18,16 +17,17 @@ public abstract class BaseRunner {
   public static final String WEBAPP_CONTEXT_PATH = "webapp.context.path";
   public static final String WEBAPP_SECURE_COOKIES = "webapp.secure.cookies";
   public static final String WEBAPP_RESOURCE_BASE = "webapp.resource.base";
-  public static final String WEBAPP_SHUTDOWN_TIMEOUT_PROPERTY = "webapp.shutdown.timeout";
 
   public static final String WEBAPP_EXTRA_CONFIGURATION_CLASSES = "webapp.configClasses";
 
   protected static final int DEFAULT_HTTP_PORT = 8090;
-  protected static final int DEFAULT_SHUTDOWN_TIMEOUT_ = 12000;
   protected static final String DEFAULT_CONTEXT_PATH = "/";
 
   protected static final Logger log = Log.getLogger("org.avaje.jettyrunner");
 
+  /**
+   * Set this on for IDE JettyRun use (for shutdown in IDE console).
+   */
   protected boolean useStdInShutdown;
   
   protected int httpPort;
@@ -36,11 +36,9 @@ public abstract class BaseRunner {
 
   protected boolean secureCookies;
 
-  protected long shutdownTimeout;
-
   protected WebAppContext webapp;
 
-  protected StatisticsHandler statistics;
+  //protected StatisticsHandler statistics;
 
   protected Server server;
 
@@ -51,7 +49,6 @@ public abstract class BaseRunner {
     this.httpPort = Integer.getInteger(WEBAPP_HTTP_PORT, DEFAULT_HTTP_PORT);
     this.contextPath = System.getProperty(WEBAPP_CONTEXT_PATH, DEFAULT_CONTEXT_PATH);
     this.secureCookies = Boolean.parseBoolean(System.getProperty(WEBAPP_SECURE_COOKIES, "true"));
-    this.shutdownTimeout = Integer.getInteger(WEBAPP_SHUTDOWN_TIMEOUT_PROPERTY, DEFAULT_SHUTDOWN_TIMEOUT_);
   }
 
   /**
@@ -66,11 +63,12 @@ public abstract class BaseRunner {
 
   protected Handler wrapHandlers() {
 
-    // stats handler keeps count of who is currently using us, so if we still
-    // have active connections we can delay shutdown
-    statistics = new StatisticsHandler();
-    statistics.setHandler(webapp);
-    return statistics;
+    // Pondering statistics collection and reporting
+//  statistics = new StatisticsHandler();
+//  statistics.setHandler(webapp);
+//  return statistics;
+    
+    return webapp;
   }
 
   /**
@@ -179,21 +177,6 @@ public abstract class BaseRunner {
    */
   public void setSecureCookies(boolean secureCookies) {
     this.secureCookies = secureCookies;
-  }
-
-  /**
-   * Return the shutdown timeout. This is used to give busy requests time to
-   * process before shutting down the server.
-   */
-  public long getShutdownTimeout() {
-    return shutdownTimeout;
-  }
-
-  /**
-   * Set the shutdown timeout.
-   */
-  public void setShutdownTimeout(long shutdownTimeout) {
-    this.shutdownTimeout = shutdownTimeout;
   }
 
 }
