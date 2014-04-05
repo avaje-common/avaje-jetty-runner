@@ -11,11 +11,18 @@
   <artifactId>avaje-jetty-runner</artifactId>
   <version>1.0.1-SNAPSHOT</version>
   <name>avaje-jetty-runner</name>
+  <url>http://avaje.org</url>
   <description>avaje-jetty-runner</description>
 
   <properties>
    <jetty.version>9.1.4.v20140401</jetty.version>
   </properties>
+  
+  <scm>
+    <connection>scm:git:https://github.com/avaje-common/avaje-jetty-runner.git</connection>
+    <developerConnection>scm:git:https://github.com/avaje-common/avaje-jetty-runner.git</developerConnection>
+    <url>https://github.com/avaje-common/avaje-jetty-runner.git</url>
+  </scm>
   
   <dependencies>
 
