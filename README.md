@@ -27,8 +27,20 @@ public class RunJettyWebappInIDE {
 
   public static void main(String[] args) {
     
-    // run the webapp (expected to be in src/main/webapp) 
+    
+    JettyRun jettyRun = new JettyRun();
+    jettyRun.setHttpPort(8090);                    // default to 8080
+    jettyRun.setContextPath("/hello");             // defaults to "/"
+    jettyRun.setResourceBase("src/main/webapp");   // defaults to "src/main/webapp"
+    
+    jettyRun.runServer();
+
+    // Or in the case where the defaults suit 
+    // run the webapp on port 8080, resources in src/main/webapp
+    // and the context path of "/"
     JettyRun.run();
+
+    
   }
 }
 ```
