@@ -8,7 +8,7 @@
 
   <groupId>org.avaje.jetty</groupId>
   <artifactId>avaje-jetty-runner</artifactId>
-  <version>1.1.0</version>
+  <version>1.1.1-SNAPSHOT</version>
   <name>avaje-jetty-runner</name>
   <url>http://avaje.org</url>
   <description>avaje-jetty-runner</description>
