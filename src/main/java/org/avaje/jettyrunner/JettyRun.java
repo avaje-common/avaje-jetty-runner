@@ -8,7 +8,6 @@ package org.avaje.jettyrunner;
  * </p>
  */
 public class JettyRun extends BaseRunner {
-  
 
   /**
    * Run the Jetty server using an expanded webapp (in src/main/webapp by default).
@@ -36,21 +35,36 @@ public class JettyRun extends BaseRunner {
    */
   public void runServer() {
 
+    setDefaultLogbackConfig();
+
     createWebAppContext();
 
     setupForExpandedWar();
 
     startServer();
   }
-  
+
+  /**
+   * If logback.configurationFile is not set then setup to look for logback.xml in the current working directory.
+   */
+  protected void setDefaultLogbackConfig() {
+
+    String logbackFile = System.getProperty("logback.configurationFile");
+    if (logbackFile == null) {
+      // set default behaviour to look in current working directory for logback.xml
+      System.setProperty("logback.configurationFile", "logback.xml");
+    }
+  }
+
   /**
    * Setup for an expanded webapp with resource base as a relative path.
    */
   protected void setupForExpandedWar() {
-    
+
+    webapp.setServerClasses(getServerClasses());
     webapp.setDescriptor(webapp + "/WEB-INF/web.xml");
     webapp.setResourceBase(resourceBase);
-    webapp.setParentLoaderPriority(true);    
+    webapp.setParentLoaderPriority(false);
   }
 
   /**

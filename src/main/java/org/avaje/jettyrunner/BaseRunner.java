@@ -3,6 +3,7 @@ package org.avaje.jettyrunner;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.SessionManager;
+import org.eclipse.jetty.server.handler.StatisticsHandler;
 import org.eclipse.jetty.server.session.AbstractSessionManager;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
@@ -20,10 +21,32 @@ public abstract class BaseRunner {
 
   public static final String WEBAPP_EXTRA_CONFIGURATION_CLASSES = "webapp.configClasses";
 
-  protected static final int DEFAULT_HTTP_PORT = 8090;
+  protected static final int DEFAULT_HTTP_PORT = 8080;
+
   protected static final String DEFAULT_CONTEXT_PATH = "/";
 
   protected static final Logger log = Log.getLogger("org.avaje.jettyrunner");
+
+  /**
+   * A modification from WebAppContext.__dftServerClasses that exposes JDT
+   * so that jsp works.
+   *
+   * @see org.eclipse.jetty.webapp.WebAppContext
+   */
+  public final static String[] exposeJdt_dftServerClasses = {
+      "-org.eclipse.jetty.continuation.", // don't hide continuation classes
+      "-org.eclipse.jetty.jndi.",         // don't hide naming classes
+      "-org.eclipse.jetty.jaas.",         // don't hide jaas classes
+      "-org.eclipse.jetty.servlets.",     // don't hide jetty servlets
+      "-org.eclipse.jetty.servlet.DefaultServlet", // don't hide default servlet
+      "-org.eclipse.jetty.servlet.listener.", // don't hide useful listeners
+      "-org.eclipse.jetty.websocket.",    // don't hide websocket classes from webapps (allow webapp to use ones from system classloader)
+      "-org.eclipse.jetty.apache.",       // don't hide jetty apache impls
+      "-org.eclipse.jetty.util.log.",     // don't hide server log
+      "org.objectweb.asm.",               // hide asm used by jetty
+      //"org.eclipse.jdt.",                 // hide jdt used by jetty
+      "org.eclipse.jetty."                // hide other jetty classes
+    } ;
 
   /**
    * Set this on for IDE JettyRun use (for shutdown in IDE console).
@@ -37,8 +60,6 @@ public abstract class BaseRunner {
   protected boolean secureCookies;
 
   protected WebAppContext webapp;
-
-  //protected StatisticsHandler statistics;
 
   protected Server server;
 
@@ -57,17 +78,23 @@ public abstract class BaseRunner {
    */
   protected void createWebAppContext() {
     webapp = new WebAppContext();
+    webapp.setServerClasses(getServerClasses());
     webapp.setContextPath(getContextPath());
     setSecureCookies();
   }
 
+  /**
+   * Refer to WebAppContext __dftServerClasses. This exposes JDT to the webapp for jsp use.
+   */
+  protected String[] getServerClasses() {
+    return exposeJdt_dftServerClasses;
+  }
+
+  /**
+   * Wrap handlers as you need with statistics collection or proxy request handling.
+   */
   protected Handler wrapHandlers() {
 
-    // Pondering statistics collection and reporting
-//  statistics = new StatisticsHandler();
-//  statistics.setHandler(webapp);
-//  return statistics;
-    
     return webapp;
   }
 
