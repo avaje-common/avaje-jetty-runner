@@ -40,4 +40,27 @@ public class RunWar extends BaseRunner {
     webapp.setWar(location.toExternalForm());
   }
 
+  /**
+   * Set the http port to use.
+   */
+  public RunWar setHttpPort(int httpPort) {
+    this.httpPort = httpPort;
+    return this;
+  }
+  
+ /**
+  * Set the context path to use.
+  */
+  public RunWar setContextPath(String contextPath) {
+    this.contextPath = contextPath;
+    return this;
+  }
+
+  /**
+   * Set the secure cookies setting.
+   */
+  public RunWar setSecureCookies(boolean secureCookies) {
+    this.secureCookies = secureCookies;
+    return this;
+  }
 }

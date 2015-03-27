@@ -10,13 +10,6 @@ package org.avaje.jettyrunner;
 public class JettyRun extends BaseRunner {
 
   /**
-   * Run the Jetty server using an expanded webapp (in src/main/webapp by default).
-   */
-  public static void run() {
-    new JettyRun().runServer();
-  }
-  
-  /**
    * The path to the webapp resource base ("src/main/webapp" by default).
    */
   protected String resourceBase;
@@ -68,17 +61,41 @@ public class JettyRun extends BaseRunner {
   }
 
   /**
-   * Set the resource base.
-   */
-  public void setResourceBase(String resourceBase) {
-    this.resourceBase = resourceBase;
-  }
-
-  /**
    * Return the resource base.
    */
   public String getResourceBase() {
-    return resourceBase;
+      return resourceBase;
   }
   
+  /**
+   * Set the resource base.
+   */
+  public JettyRun setResourceBase(String resourceBase) {
+    this.resourceBase = resourceBase;
+    return this;
+  }
+
+  /**
+   * Set the http port to use.
+   */
+  public JettyRun setHttpPort(int httpPort) {
+    this.httpPort = httpPort;
+    return this;
+  }
+  
+ /**
+  * Set the context path to use.
+  */
+  public JettyRun setContextPath(String contextPath) {
+    this.contextPath = contextPath;
+    return this;
+  }
+
+  /**
+   * Set the secure cookies setting.
+   */
+  public JettyRun setSecureCookies(boolean secureCookies) {
+    this.secureCookies = secureCookies;
+    return this;
+  }
 }

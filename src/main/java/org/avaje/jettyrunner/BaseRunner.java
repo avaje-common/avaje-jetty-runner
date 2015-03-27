@@ -3,7 +3,6 @@ package org.avaje.jettyrunner;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.SessionManager;
-import org.eclipse.jetty.server.handler.StatisticsHandler;
 import org.eclipse.jetty.server.session.AbstractSessionManager;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
@@ -172,13 +171,6 @@ public abstract class BaseRunner {
   }
 
   /**
-   * Set the http port to use.
-   */
-  public void setHttpPort(int httpPort) {
-    this.httpPort = httpPort;
-  }
-
-  /**
    * Return the context path to use.
    */
   public String getContextPath() {
@@ -186,24 +178,10 @@ public abstract class BaseRunner {
   }
 
   /**
-   * Set the context path to use.
-   */
-  public void setContextPath(String contextPath) {
-    this.contextPath = contextPath;
-  }
-
-  /**
    * Return true if secure cookies should be used.
    */
   public boolean isSecureCookies() {
     return secureCookies;
-  }
-
-  /**
-   * Set the secure cookies setting.
-   */
-  public void setSecureCookies(boolean secureCookies) {
-    this.secureCookies = secureCookies;
   }
 
 }
