@@ -7,6 +7,8 @@ import org.eclipse.jetty.server.session.AbstractSessionManager;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.websocket.jsr356.server.ServerContainer;
+import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
 
 /**
  * Base class for runnable war (RunWar) and IDE jetty runner (JettyRun).
@@ -62,6 +64,8 @@ public abstract class BaseRunner {
 
   protected Server server;
 
+  protected ServerContainer serverContainer;
+
   /**
    * Construct reading appropriate system properties.
    */
@@ -80,6 +84,18 @@ public abstract class BaseRunner {
     webapp.setServerClasses(getServerClasses());
     webapp.setContextPath(getContextPath());
     setSecureCookies();
+  }
+
+  protected void setupForWebSocket() {
+
+    try {
+      serverContainer = WebSocketServerContainerInitializer.configureContext(webapp);
+      // you can manually register endpoints to this serverContainer
+      // or register them via a ServletContextListener
+      //serverContainer.addEndpoint(MyWebSocketServerEndpoint.class);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -105,6 +121,7 @@ public abstract class BaseRunner {
     server = new Server(httpPort);
     server.setHandler(wrapHandlers());
 
+    setupForWebSocket();
     try {
       server.start();
       log.info("server started");
@@ -137,7 +154,7 @@ public abstract class BaseRunner {
     }
   }
 
-  class ShutdownRunnable implements Runnable {
+  protected class ShutdownRunnable implements Runnable {
 
     @Override
     public void run() {
