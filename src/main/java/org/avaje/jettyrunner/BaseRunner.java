@@ -10,6 +10,9 @@ import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.websocket.jsr356.server.ServerContainer;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
 /**
  * Base class for runnable war (RunWar) and IDE jetty runner (JettyRun).
  */
@@ -129,9 +132,13 @@ public abstract class BaseRunner {
       Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownRunnable()));
       
       if (useStdInShutdown) {
-        // generally for use in IDE via JettyRun
-        System.in.read();
-        shutdownNicely(false);
+        // generally for use in IDE via JettyRun, Use CTRL-D in IDE console to shutdown
+        BufferedReader systemIn = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
+        while((systemIn.readLine()) != null) {
+          // ignore anything except CTRL-D by itself
+        }
+        System.out.println("Shutdown via CTRL-D");
+        System.exit(0);
       }
 
     } catch (Exception e) {
@@ -201,4 +208,23 @@ public abstract class BaseRunner {
     return secureCookies;
   }
 
+  /**
+   * Return true if stand input should be read to determine shutdown.
+   *
+   * This should really only be true for use when running in an IDE and
+   * CTRL-D in the IDE console can be used to trigger shutdown.
+   */
+  public boolean isUseStdInShutdown() {
+    return useStdInShutdown;
+  }
+
+  /**
+   * Set if stand input should be read to determine shutdown.
+   *
+   * This should really only be true for use when running in an IDE and
+   * CTRL-D in the IDE console can be used to trigger shutdown.
+   */
+  public void setUseStdInShutdown(boolean useStdInShutdown) {
+    this.useStdInShutdown = useStdInShutdown;
+  }
 }
