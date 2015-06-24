@@ -3,6 +3,9 @@ avaje-jetty-runner
 
 Jetty webapp runner for a war file (aka runnable war) or expanded webapp (aka IDE development mode)
 
+* avaje-jetty-runner : [![Maven Central : avaje-jetty-runner](https://maven-badges.herokuapp.com/maven-central/org.avaje.jetty/avaje-jetty-runner/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.avaje.jetty/avaje-jetty-runner)
+* avaje-runnable-war : [![Maven Central : runnable-war](https://maven-badges.herokuapp.com/maven-central/org.avaje.jetty/runnable-war/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.avaje.jetty/runnable-war)
+
 
 Using JettyRun
 ---------------
@@ -34,13 +37,6 @@ public class RunJettyWebappInIDE {
     jettyRun.setResourceBase("src/main/webapp");   // defaults to "src/main/webapp"
     
     jettyRun.runServer();
-
-    // Or in the case where the defaults suit 
-    // run the webapp on port 8080, resources in src/main/webapp
-    // and the context path of "/"
-    JettyRun.run();
-
-    
   }
 }
 ```
