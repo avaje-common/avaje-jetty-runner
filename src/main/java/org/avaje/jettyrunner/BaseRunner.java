@@ -84,6 +84,7 @@ public abstract class BaseRunner {
    */
   protected void createWebAppContext() {
     webapp = new WebAppContext();
+    webapp.setThrowUnavailableOnStartupException(true);
     webapp.setServerClasses(getServerClasses());
     webapp.setContextPath(getContextPath());
     setSecureCookies();
@@ -155,7 +156,7 @@ public abstract class BaseRunner {
         // only want to log this once
         log.info("server stopped");
       }
-    } catch (Exception e) {
+    } catch (Throwable e) {
       e.printStackTrace();
       System.exit(100);
     }
