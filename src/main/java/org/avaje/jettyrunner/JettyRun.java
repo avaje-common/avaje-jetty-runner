@@ -29,24 +29,9 @@ public class JettyRun extends BaseRunner {
   public void runServer() {
 
     setDefaultLogbackConfig();
-
     createWebAppContext();
-
     setupForExpandedWar();
-
     startServer();
-  }
-
-  /**
-   * If logback.configurationFile is not set then setup to look for logback.xml in the current working directory.
-   */
-  protected void setDefaultLogbackConfig() {
-
-    String logbackFile = System.getProperty("logback.configurationFile");
-    if (logbackFile == null) {
-      // set default behaviour to look in current working directory for logback.xml
-      System.setProperty("logback.configurationFile", "logback.xml");
-    }
   }
 
   /**

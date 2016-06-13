@@ -11,6 +11,8 @@ import org.eclipse.jetty.websocket.jsr356.server.ServerContainer;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 
 /**
@@ -23,13 +25,9 @@ public abstract class BaseRunner {
   public static final String WEBAPP_SECURE_COOKIES = "webapp.secure.cookies";
   public static final String WEBAPP_RESOURCE_BASE = "webapp.resource.base";
 
-  public static final String WEBAPP_EXTRA_CONFIGURATION_CLASSES = "webapp.configClasses";
-
   protected static final int DEFAULT_HTTP_PORT = 8080;
 
   protected static final String DEFAULT_CONTEXT_PATH = "/";
-
-  protected static final Logger log = Log.getLogger("org.avaje.jettyrunner");
 
   /**
    * A modification from WebAppContext.__dftServerClasses that exposes JDT
@@ -79,6 +77,18 @@ public abstract class BaseRunner {
   }
 
   /**
+   * If logback.configurationFile is not set then setup to look for logback.xml in the current working directory.
+   */
+  protected void setDefaultLogbackConfig() {
+
+    String logbackFile = System.getProperty("logback.configurationFile");
+    if (logbackFile == null) {
+      // set default behaviour to look in current working directory for logback.xml
+      System.setProperty("logback.configurationFile", "logback.xml");
+    }
+  }
+
+  /**
    * Create the WebAppContext with basic configurations set like context path
    * etc.
    */
@@ -87,9 +97,38 @@ public abstract class BaseRunner {
     webapp.setThrowUnavailableOnStartupException(true);
     webapp.setServerClasses(getServerClasses());
     webapp.setContextPath(getContextPath());
+    webapp.setTempDirectory(createTempDir("jetty-app-"));
     setSecureCookies();
   }
 
+  protected File createTempDir(String prefix) {
+    try {
+      File tempDir = File.createTempFile(prefix + ".", "." + getHttpPort());
+      tempDir.delete();
+      tempDir.mkdir();
+      tempDir.deleteOnExit();
+      return tempDir;
+    }
+    catch (IOException ex) {
+      throw new RuntimeException("Unable to create tempDir. java.io.tmpdir is set to "+ System.getProperty("java.io.tmpdir"), ex);
+    }
+  }
+
+  /**
+   * Return true if WebSocket support is found in the classpath.
+   */
+  protected boolean isWebSocketInClassPath() {
+    try {
+      Class.forName("org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer");
+      return true;
+    } catch (ClassNotFoundException e) {
+      return false;
+    }
+  }
+
+  /**
+   * Register WebSocket endpoints via ServletContextListener.
+   */
   protected void setupForWebSocket() {
 
     try {
@@ -98,7 +137,7 @@ public abstract class BaseRunner {
       // or register them via a ServletContextListener
       //serverContainer.addEndpoint(MyWebSocketServerEndpoint.class);
     } catch (Exception e) {
-      e.printStackTrace();
+      throw new RuntimeException("Failed to initialise WebSocketServerContainer", e);
     }
   }
 
@@ -113,7 +152,6 @@ public abstract class BaseRunner {
    * Wrap handlers as you need with statistics collection or proxy request handling.
    */
   protected Handler wrapHandlers() {
-
     return webapp;
   }
 
@@ -125,10 +163,12 @@ public abstract class BaseRunner {
     server = new Server(httpPort);
     server.setHandler(wrapHandlers());
 
-    setupForWebSocket();
+    if (isWebSocketInClassPath()) {
+      setupForWebSocket();
+    }
     try {
       server.start();
-      log.info("server started");
+      log().info("server started");
 
       Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownRunnable()));
       
@@ -154,7 +194,7 @@ public abstract class BaseRunner {
       server.join();
       if (normalShutdown) {
         // only want to log this once
-        log.info("server stopped");
+        log().info("server stopped");
       }
     } catch (Throwable e) {
       e.printStackTrace();
@@ -166,7 +206,7 @@ public abstract class BaseRunner {
 
     @Override
     public void run() {
-      log.info("server shutting down");
+      log().info("server shutting down");
       shutdownNicely(true);
     }
   }
@@ -228,4 +268,9 @@ public abstract class BaseRunner {
   public void setUseStdInShutdown(boolean useStdInShutdown) {
     this.useStdInShutdown = useStdInShutdown;
   }
+
+  protected Logger log() {
+    return Log.getLogger("org.avaje.jettyrunner");
+  }
+
 }
