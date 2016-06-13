@@ -18,19 +18,24 @@
     <developerConnection>scm:git:https://github.com/avaje-common/avaje-jetty-runner.git</developerConnection>
     <url>https://github.com/avaje-common/avaje-jetty-runner.git</url>
   </scm>
+
+  <properties>
+    <websocket.scope>provided</websocket.scope>
+  </properties>
   
   <dependencies>
 
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-webapp</artifactId>
-      <version>[9.3.8.v20160314]</version>
+      <version>[9.3.9.v20160517]</version>
     </dependency>
 
     <dependency>
       <groupId>org.eclipse.jetty.websocket</groupId>
       <artifactId>javax-websocket-server-impl</artifactId>
-      <version>[9.3.8.v20160314]</version>
+      <version>[9.3.9.v20160517]</version>
+      <scope>${websocket.scope}</scope>
     </dependency>
 
   </dependencies>
