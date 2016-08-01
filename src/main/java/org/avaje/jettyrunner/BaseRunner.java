@@ -94,10 +94,6 @@ public abstract class BaseRunner {
    */
   protected void createWebAppContext() {
     webapp = new WebAppContext();
-    if (isAnnotationConfigurationInClassPath()) {
-      log().warn("... annotation scanning not support yet");
-      //webapp.setConfigurationClasses(CONFIGURATION_CLASSES_WITH_ANNOTATIONS);
-    }
     webapp.setThrowUnavailableOnStartupException(true);
     webapp.setServerClasses(getServerClasses());
     webapp.setContextPath(getContextPath());
@@ -115,18 +111,6 @@ public abstract class BaseRunner {
     }
     catch (IOException ex) {
       throw new RuntimeException("Unable to create tempDir. java.io.tmpdir is set to "+ System.getProperty("java.io.tmpdir"), ex);
-    }
-  }
-
-  /**
-   * Return true if WebSocket support is found in the classpath.
-   */
-  protected boolean isAnnotationConfigurationInClassPath() {
-    try {
-      Class.forName("org.eclipse.jetty.annotations.AnnotationConfiguration");
-      return true;
-    } catch (ClassNotFoundException e) {
-      return false;
     }
   }
 
