@@ -18,11 +18,11 @@ public class JettyRun extends BaseRunner {
    * Construct reading system properties for http port etc.
    */
   public JettyRun() {
-    this.resourceBase = System.getProperty(WEBAPP_RESOURCE_BASE,"src/main/webapp");
+    this.resourceBase = System.getProperty(WEBAPP_RESOURCE_BASE, "src/main/webapp");
     // In IDE can use this to shutdown in a console window
     this.useStdInShutdown = true;
   }
-  
+
   /**
    * Configure and run the webapp using jetty.
    */
@@ -49,9 +49,9 @@ public class JettyRun extends BaseRunner {
    * Return the resource base.
    */
   public String getResourceBase() {
-      return resourceBase;
+    return resourceBase;
   }
-  
+
   /**
    * Set the resource base.
    */
@@ -67,10 +67,10 @@ public class JettyRun extends BaseRunner {
     this.httpPort = httpPort;
     return this;
   }
-  
- /**
-  * Set the context path to use.
-  */
+
+  /**
+   * Set the context path to use.
+   */
   public JettyRun setContextPath(String contextPath) {
     this.contextPath = contextPath;
     return this;
